@@ -278,16 +278,9 @@ def upload():
     user_data = jwt.decode(token, app.config['SECRET_KEY'], 'HS256')
     info = {
         "title": data["title"],  # 标题
-        "publisher": data.get("publisher"),  # 上传者
-        "intro": data.get("intro"),  # 视频简介
-        "genre": data.get("genre"),  # 视频类型
-        "video": videourl,
-        "cover": coverurl,
-        "comment": [],
-        "producer": data.get("producer"),  # 视频制作者
-        "views": 0,
-        "collect": 0,
-        "date": date.today().isoformat(),  # 上传日期,
+        "publisher": data["publisher"],  # 上传者
+        "intro": data["intro"],  # 视频简介
+        
         "uploader": user_data.get('userid'),
     }
     videos.insert_one(info)

@@ -1,0 +1,46 @@
+<div class="container">
+    <mat-card class="card">
+        <mat-card-header class="user_card_header">
+            <mat-card-title>{{comment.username}}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <p>{{ comment.comment }}</p>
+        </mat-card-content>
+        <mat-card-actions>
+            <a (click)="showComment = !showComment">
+                <button mat-button color="grey">
+                    <mat-icon>send</mat-icon>
+                </button>
+            </a>
+            <a (click)="deleteComment()" *ngIf="getCurrentUserId()! == comment.userid">
+                <button mat-button color="grey">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </a>
+        </mat-card-actions>
+
+        <mat-card-content>
+            <div class="send_reply" *ngIf="showComment">
+                <form class="send_form" [formGroup]="commentForm" (ngSubmit)="send()">
+                    <mat-form-field appearance="fill" class="example-full-width" style="width: 100%">
+                        <mat-label>Leave a comment</mat-label>
+                        <input matInput placeholder="please input your comment" formControlName="comment">
+                    </mat-form-field>
+                    <mat-error *ngIf="commentForm.controls.comment.invalid && commentForm.controls.comment.touched">
+                        <span *ngIf="commentForm.controls.comment.errors?.['required']">Please input the comment
+                        </span>
+                        <span *ngIf="commentForm.controls.comment.errors?.['minlength']">The minlength of the comment is
+                            1
+                        </span>
+                    </mat-error>
+                    <button mat-button type="submit" style="margin-bottom: 10px">Send</button>
+
+                </form>
+            </div>
+
+        </mat-card-content>
+        <mat-card-content style="margin-bottom: 10px">
+            <ng-container *ngTemplateOutlet="template"></ng-container>
+        </mat-card-content>
+    </mat-card>
+</div>

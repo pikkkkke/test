@@ -1,0 +1,95 @@
+<div class="container"><router-outlet></router-outlet></div>
+<div class="container">
+    <div class="search_area">
+        <div class="search_field">
+            <form class="search_form" style="margin-top:10px" (ngSubmit)="search()" [formGroup]="searchForm">
+                <div class="s_area">
+                    <button mat-icon-button color="" style="margin-right: 5px;"
+                        aria-label="Example icon button with a home icon" type="submit" [matMenuTriggerFor]="filter">
+                        <mat-icon>tune</mat-icon>
+                    </button>
+                    <mat-form-field style="width: 30vw">
+                        <mat-label>Search</mat-label>
+                        <input matInput type="text" placeholder="Enter your search query"
+                            formControlName="search_content" style="width: 20vw">
+                    </mat-form-field>
+                    <button mat-icon-button color="primary" aria-label="Example icon button with a home icon"
+                        type="submit">
+                        <mat-icon>search</mat-icon>
+                    </button>
+                </div>
+            </form>
+            <div>
+                <mat-menu #filter="matMenu">
+                    <div style="padding: 5px 35px 5px 20px">
+                        <div class="filter">
+                            <label id="example-radio-group-label">Search Category</label>
+                            <mat-radio-group aria-labelledby="example-radio-group-label"
+                                style="display: flex; flex-direction: column;" class="example-radio-group"
+                                [(ngModel)]="filter_category">
+                                <mat-radio-button class="example-radio-button" value="title">
+                                    Title
+                                </mat-radio-button>
+                                <mat-radio-button class="example-radio-button" value="publisher">
+                                    Publisher
+                                </mat-radio-button>
+                                <mat-radio-button class="example-radio-button" value="producer">
+                                    Producer
+                                </mat-radio-button>
+                                <mat-radio-button class="example-radio-button" value="genre">
+                                    Genre
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+
+                    </div>
+
+                </mat-menu>
+            </div>
+
+
+        </div>
+    </div>
+    <div class="video_list">
+        <ng-container *ngFor="let video of video_list">
+
+            <mat-card class="video">
+                <a [routerLink]="['/video', video._id]" style="text-decoration:none">
+                    <img [src]="'https://img.youtube.com/vi/' + video.video_id + '/maxresdefault.jpg'"
+                        alt="Photo of a Shiba Inu" class="video_image">
+                    <mat-card-header class="header">
+                        <mat-card-title class="title"
+                            style="text-decoration: none; color: black">{{video?.title}}</mat-card-title>
+                        <mat-card-subtitle class="channel"
+                            style="text-decoration: none">{{video?.channel_title}}</mat-card-subtitle>
+                    </mat-card-header>
+                    <mat-card-content class="desc">
+                        <!-- <p>{{video?.description}}</p> -->
+                        <div class="basic_info">
+                            <div class="view">
+                                {{video.views | numberFormat}} views
+                            </div>
+                            <span>&nbsp;|&nbsp;</span>
+                            <div class="collects">
+                                {{video.collect | numberFormat}} collects
+                            </div>
+
+                        </div>
+                        <div>{{video.date}}</div>
+                    </mat-card-content>
+                </a>
+                <mat-card-actions *ngIf="isAdmin">
+                    <button mat-button (click)="deleteVideo(video._id)">Delete</button>
+                </mat-card-actions>
+
+            </mat-card>
+
+
+
+        </ng-container>
+    </div>
+
+    <mat-paginator [length]="total_size" [pageSize]="pageInfo.page_size" [pageSizeOptions]="[5, 10, 25, 100]"
+        aria-label="Select page" (page)="page_change($event)">
+    </mat-paginator>
+</div>

@@ -1,0 +1,63 @@
+<div class="container">
+    <mat-card class="card">
+
+        <mat-card-header>
+            <mat-card-title>{{ video_info | async}}</mat-card-title>
+            <mat-card-subtitle>{{video_info && video_info.publisher}}</mat-card-subtitle>
+
+        </mat-card-header>
+        <video
+            [src]="'https://cloudprojectblob.blob.core.windows.net/cloudprojectvideo/' + (video_info && video_info.video)"
+            alt="video-cover" class="video_cover" controls="controls"
+            [poster]="'https://cloudprojectblob.blob.core.windows.net/cloudprojectvideo/' + (video_info && video_info.cover)">
+            You browser doesn't support video tag
+        </video>
+        <mat-card-actions class="actions">
+            <button mat-mini-fab [color]="isInfavorite?'primary':'grey'" aria-label="Add to favorites"
+                [matTooltip]="isInfavorite?'remove from favorites':'Add to favorites'" (click)="addFavorite()">
+                <mat-icon>bookmark</mat-icon>
+            </button>
+
+        </mat-card-actions>
+    </mat-card>
+    <mat-accordion>
+        <mat-expansion-panel hideToggle [expanded]="showComments">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Comments | {{video_info && video_info.comment?.length}}
+                </mat-panel-title>
+                <mat-panel-description>
+                    click to see the comments
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+            <ng-container *ngIf="video_info">
+                <div>
+                    <form [formGroup]="commentForm" class="send_new_comment">
+                        <mat-form-field appearance="fill" class="example-full-width" style="width: 100%">
+                            <mat-label>Leave a comment</mat-label>
+                            <input matInput placeholder="please input your comment" formControlName="comment">
+                        </mat-form-field>
+                        <button mat-button type="submit" style="font-size: 18px"
+                            (click)="sendCommit(video_info && video_info._id)">
+                            <mat-icon>send</mat-icon>
+                        </button>
+                    </form>
+                </div>
+
+                <ng-container *ngFor="let _comment of video_info.comment">
+                    <div style="margin-bottom: 10px">
+                        <app-comments [comment]="_comment" [video_info]="video_info"
+                            (send_new_comment_event)="onnewcomment()">
+                        </app-comments>
+                    </div>
+
+
+
+                </ng-container>
+
+            </ng-container>
+
+        </mat-expansion-panel>
+    </mat-accordion>
+
+</div>

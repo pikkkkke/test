@@ -1,0 +1,25 @@
+<div class="container">
+  <mat-toolbar color="primary">
+    <a routerLink="/index" style="text-decoration: none; color: #fff">yuanyuan master</a>
+    <span class="toolbar-spacer"></span>
+    <button mat-icon-button class="favorite-icon" aria-label="User favorites" routerLink="/user/profile">
+      <mat-icon>favorite</mat-icon>
+    </button>
+    <button mat-icon-button aria-label="User info" class="user_info" [matMenuTriggerFor]="menu">
+      <mat-icon>account_circle</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu" class="userMenu">
+      <ng-container *ngIf="isLogin; else logout">
+        <button mat-button color="primary" class="logout" (click)="user_logout()">Logout</button>
+      </ng-container>
+      <ng-template #logout>
+        <button mat-button color="primary" class="logout" (click)="login()">Login</button>
+        <button mat-button color="primary" class="logout" (click)="signup()">Signup</button>
+      </ng-template>
+    </mat-menu>
+  </mat-toolbar>
+  <div class="content">
+    <router-outlet></router-outlet>
+  </div>
+
+</div>

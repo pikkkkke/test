@@ -1,0 +1,46 @@
+<div class="container">
+    <div class="login">
+        <h3 class="title">Login</h3>
+        <form class="login_form" [formGroup]="loginform" (ngSubmit)="onSubmit()">
+            <mat-form-field appearance="fill">
+                <mat-label>Email</mat-label>
+                <input matInput placeholder="email" formControlName="email" required autocomplete="on">
+                <mat-error *ngIf="loginform.controls.email.invalid && loginform.controls.email.touched">
+                    <span *ngIf="loginform.controls.email.errors?.['required']">Please input the email
+                    </span>
+                </mat-error>
+                <mat-error *ngIf="loginform.controls.email.invalid && loginform.controls.email.touched">
+                    <span *ngIf="loginform.controls.email.errors?.['email']">Email format is invalid
+                    </span>
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>Username</mat-label>
+                <input matInput placeholder="username" formControlName="username" required autocomplete="on">
+                <mat-error *ngIf="loginform.controls.username.invalid && loginform.controls.username.touched">
+                    <span *ngIf="loginform.controls.username.errors?.['required']">Please input the username
+                    </span>
+                    <span *ngIf="loginform.controls.username.errors?.['minlength']">The minlength of the username is 3
+                    </span>
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>Password</mat-label>
+                <input matInput placeholder="password" formControlName="password" required autocomplete="on"
+                    type="password">
+                <mat-error *ngIf="loginform.controls.password.invalid && loginform.controls.password.touched">
+                    <span *ngIf="loginform.controls.password.errors?.['required']">Please input the password
+                    </span>
+                </mat-error>
+                <mat-error *ngIf="loginform.controls.password.invalid && loginform.controls.password.touched">
+                    <span *ngIf="loginform.controls.password.errors?.['pattern']">At least on digit and one alphabet
+                    </span>
+                </mat-error>
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" [disabled]="loginform.status == 'INVALID'">Login</button>
+
+        </form>
+    </div>
+
+</div>

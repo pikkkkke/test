@@ -1,0 +1,59 @@
+<div class="container">
+    <div class="login">
+        <h3 class="title">Signup</h3>
+        <form class="signup_form" [formGroup]="signup_form" (ngSubmit)="onSubmit()">
+            <mat-form-field appearance="fill">
+                <mat-label>Email</mat-label>
+                <input matInput placeholder="email" formControlName="email" required autocomplete="on">
+                <mat-error *ngIf="signup_form.controls.email.invalid && signup_form.controls.email.touched">
+                    <span *ngIf="signup_form.controls.email.errors?.['required']">Please input the email
+                    </span>
+                </mat-error>
+                <mat-error *ngIf="signup_form.controls.email.invalid && signup_form.controls.email.touched">
+                    <span *ngIf="signup_form.controls.email.errors?.['email']">Email format is invalid
+                    </span>
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>Username</mat-label>
+                <input matInput placeholder="username" formControlName="username" required autocomplete="on">
+                <mat-error *ngIf="signup_form.controls.username.invalid && signup_form.controls.username.touched">
+                    <span *ngIf="signup_form.controls.username.errors?.['required']">Please input the username
+                    </span>
+                    <span *ngIf="signup_form.controls.username.errors?.['minlength']">The minlength of the username is 3
+                    </span>
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>Password</mat-label>
+                <input matInput placeholder="password" formControlName="password" required autocomplete="on"
+                    type="password">
+                <mat-error *ngIf="signup_form.controls.password.invalid && signup_form.controls.password.touched">
+                    <span *ngIf="signup_form.controls.password.errors?.['required']">Please input the password
+                    </span>
+                </mat-error>
+                <mat-error *ngIf="signup_form.controls.password.invalid && signup_form.controls.password.touched">
+                    <span *ngIf="signup_form.controls.password.errors?.['pattern']">At least on digit and one alphabet
+                    </span>
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>Confirm password</mat-label>
+                <input matInput placeholder="password" formControlName="password" required autocomplete="on"
+                    type="password">
+                <mat-error *ngIf="signup_form.controls.confirm.invalid && signup_form.controls.confirm.touched">
+                    <span *ngIf="signup_form.controls.confirm.errors?.['required']">Please input the password
+                    </span>
+                </mat-error>
+                <mat-error *ngIf="signup_form.controls.confirm.invalid && signup_form.controls.confirm.touched">
+                    <span *ngIf="signup_form.controls.confirm.errors?.['pattern']">At least on digit and one alphabet
+                    </span>
+                </mat-error>
+            </mat-form-field>
+
+            <button mat-raised-button color="primary">Sign up</button>
+
+        </form>
+    </div>
+
+</div>

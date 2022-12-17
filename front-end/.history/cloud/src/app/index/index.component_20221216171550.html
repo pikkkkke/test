@@ -1,0 +1,80 @@
+<div class="container"><router-outlet></router-outlet></div>
+<div class="container">
+    <div class="search_area">
+        <div class="search_field">
+            <form class="search_form" style="margin-top:10px" (ngSubmit)="search()" [formGroup]="searchForm">
+                <div class="s_area">
+                    <mat-form-field style="width: 30vw">
+                        <mat-label>Search</mat-label>
+                        <input matInput type="text" placeholder="Enter your search query"
+                            formControlName="search_content" style="width: 20vw">
+                    </mat-form-field>
+                    <button mat-icon-button color="primary" aria-label="Example icon button with a home icon"
+                        type="submit">
+                        <mat-icon>search</mat-icon>
+                    </button>
+                </div>
+                <div class="search_filter">
+                    <button mat-button [matMenuTriggerFor]="menu">Views</button>
+                    <mat-menu #menu="matMenu">
+                        <button mat-menu-item (click)="filter(0, 0)">0 - 10000</button>
+                        <button mat-menu-item (click)="filter(0, 1)">10000 - 100000</button>
+                        <button mat-menu-item (click)="filter(0,2)">100000 - 10000000</button>
+                    </mat-menu>
+                    <button mat-button [matMenuTriggerFor]="likemenu">Likes</button>
+                    <mat-menu #likemenu="matMenu">
+                        <button mat-menu-item (click)="filter(1, 0)">0 - 10000</button>
+                        <button mat-menu-item (click)="filter(1, 1)">10000 - 100000</button>
+                        <button mat-menu-item (click)="filter(1,2)">100000 - 10000000</button>
+                    </mat-menu>
+                    <button mat-button [matMenuTriggerFor]="dislikemenu">Dislikes</button>
+                    <mat-menu #dislikemenu="matMenu">
+                        <button mat-menu-item (click)="filter(2, 0)">0 - 10000</button>
+                        <button mat-menu-item (click)="filter(2, 1)">10000 - 100000</button>
+                        <button mat-menu-item (click)="filter(2,2)">100000 - 10000000</button>
+                    </mat-menu>
+                    <button mat-button [matMenuTriggerFor]="sortm">Sorting</button>
+                    <mat-menu #sortm="matMenu">
+                        <button mat-menu-item (click)="filter(3, 0)">Ascending</button>
+                        <button mat-menu-item (click)="filter(3, 1)">Descending</button>
+                    </mat-menu>
+                </div>
+            </form>
+
+        </div>
+    </div>
+    <div class="video_list">
+        <ng-container *ngFor="let video of video_list">
+
+            <mat-card class="video">
+                <a [routerLink]="['/video', video._id]" style="text-decoration:none">
+                    <img [src]="'https://img.youtube.com/vi/' + video.video_id + '/maxresdefault.jpg'"
+                        alt="Photo of a Shiba Inu" class="video_image">
+                    <mat-card-header class="header">
+                        <mat-card-title class="title"
+                            style="text-decoration: none; color: black">{{video?.title}}</mat-card-title>
+                        <mat-card-subtitle class="channel"
+                            style="text-decoration: none">{{video?.channel_title}}</mat-card-subtitle>
+                    </mat-card-header>
+                    <mat-card-content class="desc">
+                        <!-- <p>{{video?.description}}</p> -->
+                        <span>{{video.views | numberFormat}} views</span>
+                        <span>|</span>
+                        <span>{{video.likes | numberFormat }} likes</span>
+                    </mat-card-content>
+                </a>
+                <mat-card-actions *ngIf="isAdmin">
+                    <button mat-button (click)="deleteVideo(video._id)">Delete</button>
+                </mat-card-actions>
+
+            </mat-card>
+
+
+
+        </ng-container>
+    </div>
+
+    <mat-paginator [length]="total_size" [pageSize]="pageInfo.page_size" [pageSizeOptions]="[5, 10, 25, 100]"
+        aria-label="Select page" (page)="page_change($event)">
+    </mat-paginator>
+</div>

@@ -1,0 +1,91 @@
+import { Component } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
+@Component({
+  selector: 'app-upload',
+  templateUrl: './upload.component.html',
+  styleUrls: ['./upload.component.less']
+})
+export class UploadComponent {
+  showProgress = false
+  firstFormGroup = this._formBuilder.group({
+    firstCtrl: ['', Validators.required],
+  });
+  secondFormGroup = this._formBuilder.group({
+    secondCtrl: ['', Validators.required],
+  });
+  isUploaded = false;
+  isLinear = false;
+  videoURL!: string | ArrayBuffer | null;
+  fileChange(files: any) {
+    // console.log(files.files);
+    //  console.log(files.files.length);
+    if (files.files.length === 0) {
+      return;
+    }
+    const reader = new FileReader();
+    if (files.files[0].type == 'video/mp4') {
+      reader.readAsDataURL(files.files[0]);
+      reader.onload = () => {
+        this.videoURL = reader.result;
+      };
+    }
+  }
+  upload($files: any) {
+    console.log($files)
+  }
+  // 
+
+
+  constructor(private _formBuilder: FormBuilder) { }
+
+  file: any = undefined
+  onFileDropped($event: any) {
+    this.prepareFilesList($event);
+  }
+
+  /**
+   * handle file from browsing
+   */
+  fileBrowseHandler(files: any) {
+    this.prepareFilesList(files);
+  }
+
+  /**
+   * Delete file from files list
+   * @param index (File index)
+   */
+  deleteFile() {
+    this.file = undefined
+  }
+
+  /**
+   * Simulate the upload process
+   */
+  progress() {
+    this.isUploaded = true
+    this.showProgress = true
+    this.showProgress = false
+  }
+
+  /**
+   * Convert Files list to normal array list
+   * @param files (Files List)
+   */
+  prepareFilesList(files: any) {
+    if (files.target.files.length === 0) {
+      return;
+    }
+    this.progress()
+    const reader = new FileReader();
+    reader.readAsDataURL(files.target.files[0]);
+    this.file = files.target.files[0]
+    reader.onload = () => {
+      this.videoURL = reader.result;
+    };
+  }
+  onSubmit() {
+    console.log("upload")
+  }
+
+
+}

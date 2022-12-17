@@ -459,10 +459,10 @@ def delete_video(id):
     video = videos.find_one({'_id': ObjectId(id)})
     if video is not None:
         # 替换文件url获取blob名字
-        videoName = video["video"].replace(account_url+"/", "")
+        videoName = video["video"].replace(video_container+"/", "")
         video_client = blob_service_client.get_blob_client(
             container=video_container, blob=videoName)
-        coverName = video["cover"].replace(account_url+"/", "")
+        coverName = video["cover"].replace(video_container+"/", "")
         cover_client = blob_service_client.get_blob_client(
             container=cover_container, blob=coverName)
         video_client.delete_blob()

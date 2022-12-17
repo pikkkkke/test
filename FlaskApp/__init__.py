@@ -256,7 +256,25 @@ def upload():
     cover_client = blob_service_client.get_blob_client(container="cloudprojectpicture", blob=cover_name)
     block_list = []
     chunk_size = 1024*1024
-
+    # 分段上传
+    # 从刚才写到的文件中读取
+    with open(file=video_path, mode="rb") as videodata:
+        while True:
+            read_data = videodata.read(chunk_size)
+            if not read_data:
+                break
+            blk_id = str(uuid.uuid4())
+            video_client.stage_block(block_id=blk_id, data=read_data)
+            block_list.append(BlobBlock(block_id=blk_id))
+    video_client.commit_block_list(block_list)
+    with open(file=cover_path, mode="rb") as coverdata:
+        cover_client.upload_blob(coverdata)
+    # 容器路径加文件名生成文件路径
+    coverurl = "cloudprojectpicture/" + cover_name
+    videourl = "cloudprojectvideo/" + videoName
+    # 获取下用户信息
+    
+    
     return make_response(jsonify({'message': "Upload video success."}), 200)
     
 # 视频列表

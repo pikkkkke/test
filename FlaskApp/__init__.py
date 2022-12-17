@@ -465,6 +465,9 @@ def delete_video(id):
         coverName = video["cover"].replace(video_container+"/", "")
         cover_client = blob_service_client.get_blob_client(
             container=cover_container, blob=coverName)
+        video_client.delete_blob()
+        cover_client.delete_blob()
+        
         
         return make_response({"message": "Delete Video Success"}, 204)
     else:

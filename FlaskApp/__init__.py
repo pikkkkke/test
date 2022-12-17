@@ -275,7 +275,10 @@ def upload():
     # 获取下用户信息
     
     token = request.headers['x-access-token']
-
+    user_data = jwt.decode(token, app.config['SECRET_KEY'], 'HS256')
+    info = {
+        "title": data["title"],  # 标题
+    }
     videos.insert_one(info)
     return make_response(jsonify({'message': "Upload video success."}), 200)
     

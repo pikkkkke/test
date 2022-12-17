@@ -227,7 +227,6 @@ def upload():
     data = request.form
     files = request.files
     tempFilePath = tempfile.gettempdir()
-
     vid = files.get("video")
     if vid is None:
         return make_response(jsonify({'message': "Please select the video"}), 400)
@@ -235,66 +234,29 @@ def upload():
     # 首先拼接当前的时间戳来生成随机的文件名
     videoName = currentTime + vid.filename
     # 视频文件地址
-    video_path = os.path.join(tempFilePath, videoName)
+    video_path = tempFilePath+"/"+videoName
     # 保存到临时文件
     vid.save(video_path)
     # 视频文件容器
     # blob名称为视频文件名
-    video_client = blob_service_client.get_blob_client(
-        container="cloudprojectvideo", blob=videoName)
+    video_client = blob_service_client.get_blob_client(container="cloudprojectvideo", blob=videoName)
     # 获取cover名称
     cover = files.get("cover")
-    # 拼接成随机的cover名称
-    cover_name = currentTime + cover.filename
     # 判断是否获取到cover
     if cover is None:
         return make_response(jsonify({'message': "Please select the cover"}), 400)
-        # 生成一个cover_path
-    cover_path = os.path.join(tempFilePath, cover_name)
+    # 拼接成随机的cover名称
+    cover_name = currentTime + cover.filename
+    # 生成一个cover_path
+    cover_path =tempFilePath+"/"+cover_name
     # 保存cover到指定路径
     cover.save(cover_path)
     # 图片文件容器
     # 名称为随机生成的
-    cover_client = blob_service_client.get_blob_client(
-        container="cloudprojectpicture", blob=cover_name)
+    cover_client = blob_service_client.get_blob_client(container="cloudprojectpicture", blob=cover_name)
     block_list = []
     chunk_size = 1024*1024
-    # 分段上传
-    # 从刚才写到的文件中读取
-    with open(file=video_path, mode="rb") as videodata:
-        while True:
-            read_data = videodata.read(chunk_size)
-            if not read_data:
-                break
-            blk_id = str(uuid.uuid4())
-            video_client.stage_block(block_id=blk_id, data=read_data)
-            block_list.append(BlobBlock(block_id=blk_id))
-    video_client.commit_block_list(block_list)
-    with open(file=cover_path, mode="rb") as coverdata:
-        cover_client.upload_blob(coverdata)
-    # 容器路径加文件名生成文件路径
-    coverurl = "cloudprojectpicture/" + cover_name
-    videourl = "cloudprojectvideo/" + videoName
-    # 获取下用户信息
-    
-    token = request.headers['x-access-token']
-    user_data = jwt.decode(
-        token, app.config['SECRET_KEY'], 'HS256')
-    info = {
-        "title": data["title"],  # 标题
-        "publisher": data["publisher"],  # 上传者
-        "intro": data["intro"],  # 视频简介
-        "genre": data["genre"],  # 视频类型
-        "video": videourl,
-        "cover": coverurl,
-        "comment": [],
-        "producer": data["producer"],  # 视频制作者
-        "views": 0,
-        "collect": 0,
-        "date": date.today().isoformat(),  # 上传日期,
-        "uploader": user_data['userid'],
-    }
-    videos.insert_one(info)
+
     return make_response(jsonify({'message': "Upload video success."}), 200)
     
 # 视频列表

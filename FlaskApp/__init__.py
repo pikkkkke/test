@@ -126,16 +126,12 @@ def jwt_required(func):  # JWT authentication
         if not token:
             # If the token is invalid
             return make_response(jsonify({'message': 'Token is missing'}), 401)
-        try:
             # Try to decode token
-            print(token)
-            data = jwt.decode(
-                token, app.config['SECRET_KEY'], 'HS256')
-            print("parse Token: {}", data)
-        except Exception as e:
-            # Token is invalid
-            print(e)
-            return make_response(jsonify({'message': 'Token is invalid'}), 401)
+        print(token)
+        data = jwt.decode(
+            token, app.config['SECRET_KEY'], 'HS256')
+        print("parse Token: {}", data)
+        
         return func(*args, **kwargs)
     return jwt_required_wrapper
 

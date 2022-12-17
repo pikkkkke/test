@@ -281,30 +281,27 @@ def upload():
     coverurl = "cloudprojectpicture/" + cover_name
     videourl = "cloudprojectvideo/" + videoName
     # 获取下用户信息
-    try:
-        token = request.headers['x-access-token']
-        user_data = jwt.decode(
-            token, app.config['SECRET_KEY'], 'HS256')
-        info = {
-            "title": data["title"],  # 标题
-            "publisher": data["publisher"],  # 上传者
-            "intro": data["intro"],  # 视频简介
-            "genre": data["genre"],  # 视频类型
-            "video": videourl,
-            "cover": coverurl,
-            "comment": [],
-            "producer": data["producer"],  # 视频制作者
-            "views": 0,
-            "collect": 0,
-            "date": date.today().isoformat(),  # 上传日期,
-            "uploader": user_data['userid'],
-        }
-        videos.insert_one(info)
-        return make_response(jsonify({'message': "Upload video success."}), 200)
-    except Exception as e:
-        print(e)
-        # blob中blob名相同会导致错误，如果你不想用文件名生成blob名可以改一个名字生成方式
-        return make_response(jsonify({'message': "Upload fail.Please Change your file name", "error": e.message}), 400)
+    
+    token = request.headers['x-access-token']
+    user_data = jwt.decode(
+        token, app.config['SECRET_KEY'], 'HS256')
+    info = {
+        "title": data["title"],  # 标题
+        "publisher": data["publisher"],  # 上传者
+        "intro": data["intro"],  # 视频简介
+        "genre": data["genre"],  # 视频类型
+        "video": videourl,
+        "cover": coverurl,
+        "comment": [],
+        "producer": data["producer"],  # 视频制作者
+        "views": 0,
+        "collect": 0,
+        "date": date.today().isoformat(),  # 上传日期,
+        "uploader": user_data['userid'],
+    }
+    videos.insert_one(info)
+    return make_response(jsonify({'message': "Upload video success."}), 200)
+    
 # 视频列表
 
 

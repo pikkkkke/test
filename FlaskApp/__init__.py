@@ -274,7 +274,9 @@ def upload():
     videourl = "cloudprojectvideo/" + videoName
     # 获取下用户信息
     
-    
+    token = request.headers['x-access-token']
+
+    videos.insert_one(info)
     return make_response(jsonify({'message': "Upload video success."}), 200)
     
 # 视频列表

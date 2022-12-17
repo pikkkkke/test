@@ -126,12 +126,16 @@ def jwt_required(func):  # JWT authentication
         if not token:
             # If the token is invalid
             return make_response(jsonify({'message': 'Token is missing'}), 401)
+        try:
             # Try to decode token
-        print(token)
-        data = jwt.decode(
-            token, app.config['SECRET_KEY'], 'HS256')
-        print("parse Token: {}", data)
-        
+            print(token)
+            data = jwt.decode(
+                token, app.config['SECRET_KEY'], 'HS256')
+            print("parse Token: {}", data)
+        except Exception as e:
+            # Token is invalid
+            print(e)
+            return make_response(jsonify({'message': 'Token is invalid'}), 401)
         return func(*args, **kwargs)
     return jwt_required_wrapper
 
@@ -140,6 +144,17 @@ def jwt_required(func):  # JWT authentication
 @jwt_required
 def status():
     return make_response(jsonify({"message": "ok"}), 200)
+
+
+@app.route('/cloud/api/v1/user/<string:id>/info', methods=['GET'])  # 获取用户信息
+def get_user_info(id):
+    if id is None:
+        return make_response(jsonify({"message": "Please pass the userid"}), 404)
+    user = users.find({"_id": ObjectId(id)})
+    if user is None:
+        return make_response(jsonify({"message": "Can't find the user"}), 404)
+    for u in user:
+        return make_response(jsonify({"username": u['username'], "identity": u['identity'], "email": u['email'], "userid": str(u['_id'])}), 200)
 
 
 @app.route('/cloud/api/v1/login', methods=['POST'])
@@ -223,10 +238,12 @@ def register():
 
 
 @app.route('/cloud/api/v1/video', methods=['POST'])
+@jwt_required
 def upload():
     data = request.form
     files = request.files
     tempFilePath = tempfile.gettempdir()
+
     vid = files.get("video")
     if vid is None:
         return make_response(jsonify({'message': "Please select the video"}), 400)
@@ -234,26 +251,28 @@ def upload():
     # 首先拼接当前的时间戳来生成随机的文件名
     videoName = currentTime + vid.filename
     # 视频文件地址
-    video_path = tempFilePath+"/"+videoName
+    video_path = os.path.join(tempFilePath, videoName)
     # 保存到临时文件
     vid.save(video_path)
     # 视频文件容器
     # blob名称为视频文件名
-    video_client = blob_service_client.get_blob_client(container="cloudprojectvideo", blob=videoName)
+    video_client = blob_service_client.get_blob_client(
+        container="cloudprojectvideo", blob=videoName)
     # 获取cover名称
     cover = files.get("cover")
+    # 拼接成随机的cover名称
+    cover_name = currentTime + cover.filename
     # 判断是否获取到cover
     if cover is None:
         return make_response(jsonify({'message': "Please select the cover"}), 400)
-    # 拼接成随机的cover名称
-    cover_name = currentTime + cover.filename
-    # 生成一个cover_path
-    cover_path =tempFilePath+"/"+cover_name
+        # 生成一个cover_path
+    cover_path = os.path.join(tempFilePath, cover_name)
     # 保存cover到指定路径
     cover.save(cover_path)
     # 图片文件容器
     # 名称为随机生成的
-    cover_client = blob_service_client.get_blob_client(container="cloudprojectpicture", blob=cover_name)
+    cover_client = blob_service_client.get_blob_client(
+        container="cloudprojectpicture", blob=cover_name)
     block_list = []
     chunk_size = 1024*1024
     # 分段上传
@@ -273,16 +292,30 @@ def upload():
     coverurl = "cloudprojectpicture/" + cover_name
     videourl = "cloudprojectvideo/" + videoName
     # 获取下用户信息
-    
-    info = {
-        "title": data["title"],  # 标题
-        "publisher": data["publisher"],  # 上传者
-        "intro": data["intro"],  # 视频简介
-        
-    }
-    videos.insert_one(info)
-    return make_response(jsonify({'message': "Upload video success."}), 200)
-    
+    try:
+        token = request.headers['x-access-token']
+        user_data = jwt.decode(
+            token, app.config['SECRET_KEY'], 'HS256')
+        info = {
+            "title": data["title"],  # 标题
+            "publisher": data["publisher"],  # 上传者
+            "intro": data["intro"],  # 视频简介
+            "genre": data["genre"],  # 视频类型
+            "video": videourl,
+            "cover": coverurl,
+            "comment": [],
+            "producer": data["producer"],  # 视频制作者
+            "views": 0,
+            "collect": 0,
+            "date": date.today().isoformat(),  # 上传日期,
+            "uploader": user_data['userid'],
+        }
+        videos.insert_one(info)
+        return make_response(jsonify({'message': "Upload video success."}), 200)
+    except Exception as e:
+        print(e)
+        # blob中blob名相同会导致错误，如果你不想用文件名生成blob名可以改一个名字生成方式
+        return make_response(jsonify({'message': "Upload fail.Please Change your file name", "error": e.message}), 400)
 # 视频列表
 
 
@@ -323,7 +356,8 @@ def show_all_videos():
             "views": video["views"],
             "collect": video["collect"],
             "video": video["video"],
-            "date": video["date"]
+            "date": video["date"],
+            "uploader": video['uploader'],
         }
 
         data_to_return.append(data)
@@ -469,7 +503,7 @@ def get_if_video_in_collection(id):
     user_data = jwt.decode(
         token, app.config['SECRET_KEY'], 'HS256')
     user = users.aggregate(
-        [{"$match": {"_id": user_data['userid']}}, {"$match": {"collectVideo": {"$in": [id]}}}, {"$project": {"collection": "$collectVideo"}}])
+        [{"$match": {"_id": ObjectId(user_data['userid'])}}, {"$match": {"collectVideo": {"$in": [id]}}}])
     if user.alive is False:
         return make_response(jsonify({"message": "no"}), 404)
     else:
@@ -611,3 +645,4 @@ def genre_filter(showdata, genre):
 
 if __name__ == "__main__":
     app.run()
+

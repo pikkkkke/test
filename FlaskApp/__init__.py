@@ -281,7 +281,6 @@ def upload():
         "publisher": data["publisher"],  # 上传者
         "intro": data["intro"],  # 视频简介
         
-        "uploader": user_data.get('userid'),
     }
     videos.insert_one(info)
     return make_response(jsonify({'message': "Upload video success."}), 200)

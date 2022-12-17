@@ -223,7 +223,6 @@ def register():
 
 
 @app.route('/cloud/api/v1/video', methods=['POST'])
-@jwt_required
 def upload():
     data = request.form
     files = request.files

@@ -467,9 +467,8 @@ def delete_video(id):
             container=cover_container, blob=coverName)
         video_client.delete_blob()
         cover_client.delete_blob()
-        result = videos.delete_one({"_id": ObjectId(id)})
-        if result.deleted_count == 1:
-            return make_response({"message": "Delete Video Success"}, 204)
+        
+        return make_response({"message": "Delete Video Success"}, 204)
     else:
         response = jsonify({"message": "Wrong video ID"})
         return make_response(response, 404)
